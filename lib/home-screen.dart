@@ -14,6 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     notificationsServices.requestNotificationPermission();
     notificationsServices.firebaseInit(context);
+    notificationsServices.setInteractMessage(context);
    // notificationsServices.isTokenRefresh();//this function will not work bcz always getDviceToken() function calls first and you get new function, but you both functions have their own benefit
     notificationsServices.getDeviceToken().then((value)// use then bcz its been called from future function
     {

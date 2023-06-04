@@ -1,3 +1,5 @@
+import 'dart:html';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:firebase_notifications/message-screen.dart';
@@ -41,8 +43,7 @@ class NotificationsServices {
     }
   }
 
-  void initLocalNotifications(
-      BuildContext context, RemoteMessage message) async {
+  void initLocalNotifications(BuildContext context, RemoteMessage message) async {
     // to show notification when App is running follow below procedure
     var androidInitializationSettings = const AndroidInitializationSettings(
         '@mipmap/ic_launcher'); // logo of android App attach with notification
@@ -69,8 +70,18 @@ class NotificationsServices {
         print(message.data['type']);
         print(message.data['id']);
       }
-      initLocalNotifications(context, message);
-      showNotification(message);
+
+        initLocalNotifications(context, message);
+        showNotification(message);
+
+      // if(Platform.isAndroid){ when Ap runs in Android only
+      //   initLocalNotifications(context, message);
+      //   showNotification(message);
+      // }
+      // else{
+      //   showNotification(message);
+      // }
+
     });
   }
 
@@ -122,11 +133,27 @@ class NotificationsServices {
       print('refresh');
     });
   }
+  Future<void>setInteractMessage(BuildContext context)async{
+    //when App is terminated
+    RemoteMessage? initialMessage=await FirebaseMessaging.instance.getInitialMessage();
+    if(initialMessage!=null){
+      handleMessage(context,initialMessage);
+    }
+    //when App is in background
+    FirebaseMessaging.onMessageOpenedApp.listen((event) {
+      handleMessage(context, event);
+    });
+
+  }
 
   void handleMessage(BuildContext context, RemoteMessage message) {
     if (message.data['type'] == 'msg') {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MessageScreen(id: '',)));
+          context,
+          MaterialPageRoute(
+              builder: (context) => MessageScreen(
+                    id: message.data['id'],
+                  )));
     }
   }
 }
